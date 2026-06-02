@@ -338,15 +338,7 @@
       );
     }
 
-    // Animate rows in sequence, top to bottom
-    async function intro() {
-      for (let i = 0; i < allTiles.length; i++) {
-        await animateRowTo(allTiles[i], ROWS[i], 0);
-        await new Promise(r => setTimeout(r, 180));
-      }
-    }
-
-    intro();
+    allTiles.forEach((tiles, i) => animateRowTo(tiles, ROWS[i], 0));
   </script>
 </body>
 </html>
