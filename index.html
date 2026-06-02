@@ -72,6 +72,13 @@
       gap: var(--gap);
     }
 
+    .board-rule {
+      width: 100%;
+      height: 1px;
+      background: var(--rule);
+      margin: 0.35rem 0;
+    }
+
     /* ── Tile ─────────────────────────────────────────── */
 
     .tile {
@@ -223,6 +230,7 @@
     <div class="board" aria-live="polite">
       <div class="board-row" id="row-0"></div>
       <div class="board-row" id="row-1"></div>
+      <div class="board-rule"></div>
       <div class="board-row" id="row-2"></div>
       <div class="board-row" id="row-3"></div>
       <div class="board-row" id="row-4"></div>
