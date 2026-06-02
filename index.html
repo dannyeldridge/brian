@@ -16,9 +16,9 @@
       --text-dim: #6b6560;
       --accent: #c8a96e;
       --gap: 3px;
-      --tw: 38px;
-      --th: 56px;
-      --fs: 1.85rem;
+      --tw: 34px;
+      --th: 52px;
+      --fs: 1.65rem;
     }
 
     body {
@@ -37,7 +37,7 @@
     .board {
       display: flex;
       flex-direction: column;
-      gap: 0.75rem;
+      gap: 0.6rem;
       align-items: center;
     }
 
@@ -55,14 +55,6 @@
       perspective: 400px;
       flex-shrink: 0;
     }
-
-    /*
-      Half-character technique:
-      Each half (.tu / .tl) is height/2 with overflow:hidden.
-      Inside is a .tw (text-wrap) that is the full tile height,
-      flex-centered so the character sits perfectly in the middle.
-      .tu shows the top half; .tl shifts .tw up by 50% to show the bottom half.
-    */
 
     .tu, .tl {
       position: absolute;
@@ -86,7 +78,7 @@
     }
 
     .tw {
-      height: calc(var(--th));
+      height: var(--th);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -98,8 +90,6 @@
     .tl .tw {
       margin-top: calc(var(--th) * -0.5);
     }
-
-    /* ── Flap (top half that rotates down) ────────────── */
 
     .flap {
       position: absolute;
@@ -115,17 +105,64 @@
       pointer-events: none;
     }
 
-    .flap .tw {
-      /* same as .tu .tw */
-    }
-
     .flap.flip {
-      animation: flapDown 130ms linear forwards;
+      animation: flapDown 120ms linear forwards;
     }
 
     @keyframes flapDown {
       from { transform: rotateX(0deg); }
       to   { transform: rotateX(-90deg); }
+    }
+
+    /* ── Row label ───────────────────────────────────── */
+
+    .row-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    /* ── Clients ─────────────────────────────────────── */
+
+    .clients {
+      display: flex;
+      align-items: center;
+      gap: 2.5rem;
+    }
+
+    .client-logo {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .logo-box {
+      width: 120px;
+      height: 60px;
+      border: 1px solid var(--tile-border);
+      background: #111;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-dim);
+      font-size: 0.6rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+    }
+
+    .logo-name {
+      font-size: 0.6rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+    }
+
+    .clients-divider {
+      width: 1px;
+      height: 40px;
+      background: var(--tile-border);
     }
 
     /* ── Info footer ─────────────────────────────────── */
@@ -177,22 +214,38 @@
       z-index: 100;
     }
 
-    @media (max-width: 520px) {
-      :root { --tw: 28px; --th: 44px; --fs: 1.4rem; }
+    @media (max-width: 600px) {
+      :root { --tw: 22px; --th: 36px; --fs: 1.1rem; }
+      .logo-box { width: 90px; height: 48px; }
+      .clients { gap: 1.5rem; }
     }
   </style>
 </head>
 <body>
 
-  <div class="board" aria-live="polite" aria-label="Dialed In Projects — Coming Soon">
+  <div class="board" aria-live="polite">
     <div class="board-row" id="row-0"></div>
     <div class="board-row" id="row-1"></div>
   </div>
 
+  <div class="clients">
+    <div class="client-logo">
+      <div class="logo-box">[ NVE logo ]</div>
+      <span class="logo-name">NVE Experience Agency</span>
+    </div>
+    <div class="clients-divider"></div>
+    <div class="client-logo">
+      <div class="logo-box">[ Metro PR logo ]</div>
+      <span class="logo-name">Metro Public Relations</span>
+    </div>
+    <div class="clients-divider"></div>
+    <div class="client-logo">
+      <div class="logo-box">[ Dad Grass logo ]</div>
+      <span class="logo-name">Dad Grass</span>
+    </div>
+  </div>
+
   <div class="info">
-    <span class="info-label">Status</span>
-    <span class="info-value">Coming Soon</span>
-    <div class="divider"></div>
     <span class="info-label">Contact</span>
     <span class="info-value">
       <a href="mailto:brian@dialedinprojects.com">brian@dialedinprojects.com</a>
@@ -200,39 +253,42 @@
   </div>
 
   <script>
-    const CHARS = ' ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@.-_';
+    const CHARS = ' ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@.-_&';
 
-    const LINES = [
-      'DIALED IN PROJECTS',
-      '  COMING  SOON    ',
+    // All cycling phrases must be the same length — pad with spaces
+    const STATIC_LINE  = 'DIALED IN PROJECTS    ';
+    const CYCLE_LINES  = [
+      'AWARD WINNING BRAND STRATEGY  ',
+      'EXPERIENTIAL MARKETING        ',
+      'LOGISTICS AND PARTNERSHIPS    ',
     ];
+
+    // Normalize all rows to the same width as the longest
+    const maxLen = Math.max(STATIC_LINE.length, ...CYCLE_LINES.map(l => l.length));
+    function pad(s) { return s.padEnd(maxLen, ' '); }
+
+    const LINE0 = pad(STATIC_LINE).split('');
+    const CYCLES = CYCLE_LINES.map(l => pad(l).split(''));
 
     function charIndex(c) {
       const i = CHARS.indexOf(c.toUpperCase());
       return i < 0 ? 0 : i;
     }
-
     function nextChar(c) {
       return CHARS[(charIndex(c) + 1) % CHARS.length];
     }
 
-    function makeTileHTML(ch) {
-      return `
-        <div class="tu"><div class="tw">${ch}</div></div>
-        <div class="tl"><div class="tw">${ch}</div></div>
-        <div class="flap"><div class="tw">${ch}</div></div>
-      `;
-    }
-
-    // Build all tiles
-    const tileMaps = LINES.map((line, rowIdx) => {
-      const row = document.getElementById(`row-${rowIdx}`);
-      return line.split('').map(targetChar => {
+    function buildRow(rowId, chars) {
+      const row = document.getElementById(rowId);
+      return chars.map(() => {
         const el = document.createElement('div');
         el.className = 'tile';
-        el.innerHTML = makeTileHTML(' ');
+        el.innerHTML = `
+          <div class="tu"><div class="tw"> </div></div>
+          <div class="tl"><div class="tw"> </div></div>
+          <div class="flap"><div class="tw"> </div></div>
+        `;
         row.appendChild(el);
-
         return {
           el,
           tuTw:   el.querySelector('.tu .tw'),
@@ -240,36 +296,26 @@
           flap:   el.querySelector('.flap'),
           flapTw: el.querySelector('.flap .tw'),
           current: ' ',
-          target: targetChar,
         };
       });
-    });
+    }
 
-    function stepTile(t) {
+    const row0tiles = buildRow('row-0', LINE0);
+    const row1tiles = buildRow('row-1', CYCLES[0]);
+
+    function stepTile(t, target) {
       return new Promise(resolve => {
-        if (t.current === t.target) { resolve(false); return; }
-
+        if (t.current === target) { resolve(false); return; }
         const from = t.current;
         const to   = nextChar(from);
-
-        // static halves already show `from` (from last step or init)
-        // flap shows `from` and will rotate down
         t.flapTw.textContent = from;
-
-        // behind the flap, update the upper static half to show `to`
-        // (it's hidden by the flap until the flap rotates away)
-        t.tuTw.textContent = to;
-
-        // kick the flap animation
+        t.tuTw.textContent   = to;
         t.flap.classList.remove('flip');
         void t.flap.offsetWidth;
         t.flap.classList.add('flip');
-
         t.flap.addEventListener('animationend', () => {
           t.current = to;
-          // lower half now shows the new char
-          t.tlTw.textContent = to;
-          // reset flap to new char (hidden at 90deg, but reset for next step)
+          t.tlTw.textContent   = to;
           t.flapTw.textContent = to;
           t.flap.classList.remove('flip');
           resolve(true);
@@ -277,21 +323,41 @@
       });
     }
 
-    function animateTile(t, delay) {
-      setTimeout(async () => {
-        while (true) {
-          const changed = await stepTile(t);
-          if (!changed) break;
-          await new Promise(r => setTimeout(r, 20 + Math.random() * 28));
-        }
-      }, delay);
+    // Animate a single tile to a target char, stepping through CHARS in order
+    async function animateTileTo(t, target, startDelay = 0) {
+      await new Promise(r => setTimeout(r, startDelay));
+      while (t.current !== target) {
+        await stepTile(t, target);
+        if (t.current !== target)
+          await new Promise(r => setTimeout(r, 18 + Math.random() * 26));
+      }
     }
 
-    let d = 0;
-    tileMaps.forEach(row => {
-      row.forEach(t => { animateTile(t, d); d += 52; });
-      d += 140;
-    });
+    // Animate a full row to a target char array, staggered left-to-right
+    function animateRowTo(tiles, targets, baseDelay = 0) {
+      return Promise.all(
+        tiles.map((t, i) => animateTileTo(t, targets[i], baseDelay + i * 48))
+      );
+    }
+
+    // Entry animation: row 0, then row 1
+    async function intro() {
+      await animateRowTo(row0tiles, LINE0, 0);
+      await animateRowTo(row1tiles, CYCLES[0], 200);
+      return animateRowTo(row0tiles, LINE0, 0); // ensure row 0 fully settled
+    }
+
+    // Cycle row 1 through phrases indefinitely
+    async function cycleRow1() {
+      let idx = 0;
+      while (true) {
+        await new Promise(r => setTimeout(r, 3000));
+        idx = (idx + 1) % CYCLES.length;
+        await animateRowTo(row1tiles, CYCLES[idx], 0);
+      }
+    }
+
+    intro().then(cycleRow1);
   </script>
 </body>
 </html>
