@@ -228,6 +228,8 @@
     <div class="board-row" id="row-1"></div>
     <div class="board-row" id="row-2"></div>
     <div class="board-row" id="row-3"></div>
+    <div class="board-row" id="row-4"></div>
+    <div class="board-row" id="row-5"></div>
   </div>
 
   <div class="clients">
@@ -264,10 +266,16 @@
       'LOGISTICS AND PARTNERSHIPS',
     ];
 
+    const PAD_SIDES = 2; // empty tiles on each end of every row
     const maxLen = Math.max(...LINES.map(l => l.length));
-    function pad(s) { return s.padEnd(maxLen, ' '); }
+    function pad(s) {
+      const centered = s.padEnd(maxLen, ' ');
+      return ' '.repeat(PAD_SIDES) + centered + ' '.repeat(PAD_SIDES);
+    }
 
-    const ROWS = LINES.map(l => pad(l).split(''));
+    const rowWidth = maxLen + PAD_SIDES * 2;
+    const EMPTY_ROW = ' '.repeat(rowWidth).split('');
+    const ROWS = [EMPTY_ROW, ...LINES.map(l => pad(l).split('')), EMPTY_ROW];
 
     function charIndex(c) {
       const i = CHARS.indexOf(c.toUpperCase());
