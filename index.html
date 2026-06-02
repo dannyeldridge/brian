@@ -211,8 +211,15 @@
       z-index: 100;
     }
 
+    .board--mobile { display: none; }
+
     @media (max-width: 600px) {
-      :root { --tw: 21px; --th: 34px; --fs: 1.05rem; }
+      :root { --mtw: 28px; --mth: 44px; --mfs: 1.35rem; }
+      .board--desktop { display: none; }
+      .board--mobile  { display: flex; }
+      .board--mobile .tw { font-size: var(--mfs); height: var(--mth); }
+      .board--mobile .tile { width: var(--mtw); height: var(--mth); }
+      .board--mobile .tl .tw { margin-top: calc(var(--mth) * -0.5); }
       .client-link { font-size: 1.5rem; }
       .rule { margin: 1.75rem 0; }
     }
@@ -221,7 +228,7 @@
 <body>
 
   <div class="section">
-    <div class="board" aria-live="polite">
+    <div class="board board--desktop" aria-live="polite">
       <div class="board-row" id="row-0"></div>
       <div class="board-row" id="row-1"></div>
       <div class="board-row" id="row-2"></div>
@@ -229,6 +236,15 @@
       <div class="board-row" id="row-4"></div>
       <div class="board-row" id="row-5"></div>
       <div class="board-row" id="row-6"></div>
+    </div>
+    <div class="board board--mobile" aria-live="polite">
+      <div class="board-row" id="mrow-0"></div>
+      <div class="board-row" id="mrow-1"></div>
+      <div class="board-row" id="mrow-2"></div>
+      <div class="board-row" id="mrow-3"></div>
+      <div class="board-row" id="mrow-4"></div>
+      <div class="board-row" id="mrow-5"></div>
+      <div class="board-row" id="mrow-6"></div>
     </div>
   </div>
 
@@ -261,11 +277,20 @@
     ];
 
     const maxLen = Math.max(...LINES.map(l => l.length));
-    function pad(s) { return ' ' + s.padEnd(maxLen, ' ') + ' '; }
+    function pad(s, max) { return ' ' + s.padEnd(max, ' ') + ' '; }
+    const EMPTY_ROW = ' '.repeat(maxLen + 2).split('');
+    const ROWS = [EMPTY_ROW, ...LINES.slice(0,1).map(l => pad(l, maxLen).split('')), EMPTY_ROW, ...LINES.slice(1).map(l => pad(l, maxLen).split('')), EMPTY_ROW];
 
-    const rowWidth = maxLen + 2;
-    const EMPTY_ROW = ' '.repeat(rowWidth).split('');
-    const ROWS = [EMPTY_ROW, ...LINES.slice(0,1).map(l => pad(l).split('')), EMPTY_ROW, ...LINES.slice(1).map(l => pad(l).split('')), EMPTY_ROW];
+    const MOBILE_LINES = [
+      'DIALED IN',
+      'PROJECTS',
+      'BRANDING',
+      'MARKETING',
+      'EXPERIENCES',
+    ];
+    const mMaxLen = Math.max(...MOBILE_LINES.map(l => l.length));
+    const M_EMPTY = ' '.repeat(mMaxLen + 2).split('');
+    const MROWS = [M_EMPTY, ...MOBILE_LINES.slice(0,2).map(l => pad(l, mMaxLen).split('')), M_EMPTY, ...MOBILE_LINES.slice(2).map(l => pad(l, mMaxLen).split('')), M_EMPTY];
 
     function charIndex(c) {
       const i = CHARS.indexOf(c.toUpperCase());
@@ -297,7 +322,8 @@
       });
     }
 
-    const allTiles = ROWS.map((row, i) => buildRow(`row-${i}`, row));
+    const allTiles  = ROWS.map((row, i)  => buildRow(`row-${i}`,  row));
+    const mAllTiles = MROWS.map((row, i) => buildRow(`mrow-${i}`, row));
 
     function stepTile(t, target) {
       return new Promise(resolve => {
@@ -334,7 +360,8 @@
       );
     }
 
-    allTiles.forEach((tiles, i) => animateRowTo(tiles, ROWS[i], i * 150));
+    allTiles.forEach((tiles, i)  => animateRowTo(tiles,  ROWS[i],  i * 150));
+    mAllTiles.forEach((tiles, i) => animateRowTo(tiles, MROWS[i],  i * 150));
   </script>
 </body>
 </html>
