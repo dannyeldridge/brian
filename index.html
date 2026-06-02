@@ -11,14 +11,17 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg: #0a0a0a;
-      --tile-top-bg: #161616;
-      --tile-bot-bg: #0e0e0e;
-      --tile-border: #222;
-      --text: #e8e0d0;
-      --text-dim: #6b6560;
+      --bg: #080808;
+      --tile-top-bg: #151515;
+      --tile-bot-bg: #0c0c0c;
+      --tile-border: #1f1f1f;
+      --rule: #1a1a1a;
+      --text: #ddd6c8;
+      --text-dim: #4a4540;
+      --text-mid: #7a7268;
       --accent: #c8a96e;
       --gap: 3px;
+      --row-gap: 4px;
       --tw: 34px;
       --th: 52px;
       --fs: 1.65rem;
@@ -26,21 +29,41 @@
 
     body {
       background: var(--bg);
+      background-image: radial-gradient(ellipse at 50% 40%, #111 0%, #080808 70%);
       color: var(--text);
-      font-family: 'Courier New', Courier, monospace;
+      font-family: 'Bebas Neue', sans-serif;
       min-height: 100dvh;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 3.5rem;
-      padding: 2rem;
+      padding: 3rem 2rem;
     }
+
+    /* ── Layout sections ─────────────────────────────── */
+
+    .section {
+      width: 100%;
+      max-width: 1100px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .rule {
+      width: 100%;
+      max-width: 1100px;
+      height: 1px;
+      background: var(--rule);
+      margin: 2.5rem 0;
+    }
+
+    /* ── Board ───────────────────────────────────────── */
 
     .board {
       display: flex;
       flex-direction: column;
-      gap: 0.6rem;
+      gap: var(--row-gap);
       align-items: center;
     }
 
@@ -85,19 +108,17 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      font-family: 'Courier New', Courier, monospace;
       font-size: var(--fs);
       font-weight: bold;
       color: var(--text);
     }
 
-    .tl .tw {
-      margin-top: calc(var(--th) * -0.5);
-    }
+    .tl .tw { margin-top: calc(var(--th) * -0.5); }
 
     .flap {
       position: absolute;
-      top: 0;
-      left: 0;
+      top: 0; left: 0;
       width: 100%;
       height: 50%;
       overflow: hidden;
@@ -108,94 +129,72 @@
       pointer-events: none;
     }
 
-    .flap.flip {
-      animation: flapDown 120ms linear forwards;
-    }
+    .flap.flip { animation: flapDown 120ms linear forwards; }
 
     @keyframes flapDown {
       from { transform: rotateX(0deg); }
       to   { transform: rotateX(-90deg); }
     }
 
-    /* ── Row label ───────────────────────────────────── */
-
-    .row-wrap {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 0.35rem;
-    }
-
     /* ── Clients ─────────────────────────────────────── */
 
-    .clients {
-      display: flex;
-      align-items: center;
-      gap: 2.5rem;
+    .clients-label {
+      font-size: 0.7rem;
+      letter-spacing: 0.3em;
+      color: var(--text-dim);
+      margin-bottom: 1.25rem;
+      font-family: 'Bebas Neue', sans-serif;
     }
 
-    .clients {
+    .clients-row {
+      display: flex;
       align-items: center;
       width: 100%;
-      max-width: 700px;
+      max-width: 560px;
+      gap: 2rem;
     }
 
     .client-link {
       flex: 1;
       font-family: 'Bebas Neue', sans-serif;
-      font-size: 1.6rem;
-      line-height: 1.1;
-      letter-spacing: 0.08em;
-      color: var(--text-dim);
+      font-size: 2rem;
+      line-height: 1.0;
+      letter-spacing: 0.05em;
+      color: var(--text-mid);
       text-decoration: none;
-      transition: color 0.2s;
+      transition: color 0.25s;
     }
 
     .client-link--right { text-align: right; }
     .client-link--left  { text-align: left; }
+    .client-link:hover  { color: var(--text); }
 
-    .client-link:hover { color: var(--accent); }
-
-    .clients-divider {
+    .clients-pipe {
       width: 1px;
-      height: 40px;
-      background: var(--tile-border);
+      height: 52px;
+      background: var(--rule);
+      flex-shrink: 0;
     }
 
-    /* ── Info footer ─────────────────────────────────── */
+    /* ── Contact ─────────────────────────────────────── */
 
-    .info {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    .info-label {
-      font-size: 0.65rem;
-      letter-spacing: 0.25em;
-      text-transform: uppercase;
+    .contact-label {
+      font-size: 0.7rem;
+      letter-spacing: 0.3em;
       color: var(--text-dim);
+      margin-bottom: 0.6rem;
     }
 
-    .info-value {
-      font-size: 0.85rem;
-      letter-spacing: 0.1em;
+    .contact-email {
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 0.9rem;
+      letter-spacing: 0.08em;
       color: var(--accent);
-    }
-
-    .info-value a {
-      color: inherit;
       text-decoration: none;
+      transition: opacity 0.2s;
     }
 
-    .info-value a:hover { text-decoration: underline; }
-
-    .divider {
-      width: 1px;
-      height: 2rem;
-      background: var(--tile-border);
-    }
+    .contact-email:hover { opacity: 0.7; }
 
     /* scanlines */
     body::after {
@@ -205,41 +204,48 @@
       background: repeating-linear-gradient(
         to bottom,
         transparent 0, transparent 3px,
-        rgba(0,0,0,0.07) 3px, rgba(0,0,0,0.07) 4px
+        rgba(0,0,0,0.06) 3px, rgba(0,0,0,0.06) 4px
       );
       pointer-events: none;
       z-index: 100;
     }
 
     @media (max-width: 600px) {
-      :root { --tw: 22px; --th: 36px; --fs: 1.1rem; }
-      .logo-box { width: 90px; height: 48px; }
-      .clients { gap: 1.5rem; }
+      :root { --tw: 21px; --th: 34px; --fs: 1.05rem; }
+      .client-link { font-size: 1.5rem; }
+      .rule { margin: 1.75rem 0; }
     }
   </style>
 </head>
 <body>
 
-  <div class="board" aria-live="polite">
-    <div class="board-row" id="row-0"></div>
-    <div class="board-row" id="row-1"></div>
-    <div class="board-row" id="row-2"></div>
-    <div class="board-row" id="row-3"></div>
-    <div class="board-row" id="row-4"></div>
-    <div class="board-row" id="row-5"></div>
+  <div class="section">
+    <div class="board" aria-live="polite">
+      <div class="board-row" id="row-0"></div>
+      <div class="board-row" id="row-1"></div>
+      <div class="board-row" id="row-2"></div>
+      <div class="board-row" id="row-3"></div>
+      <div class="board-row" id="row-4"></div>
+      <div class="board-row" id="row-5"></div>
+    </div>
   </div>
 
-  <div class="clients">
-    <a class="client-link client-link--right" href="https://www.metropublicrelations.com/" target="_blank" rel="noopener">Metro Public<br>Relations</a>
-    <div class="clients-divider"></div>
-    <a class="client-link client-link--left" href="https://dadgrass.com/" target="_blank" rel="noopener">Dad<br>Grass</a>
+  <div class="rule"></div>
+
+  <div class="section">
+    <span class="clients-label">Clients</span>
+    <div class="clients-row">
+      <a class="client-link client-link--right" href="https://www.metropublicrelations.com/" target="_blank" rel="noopener">Metro Public<br>Relations</a>
+      <div class="clients-pipe"></div>
+      <a class="client-link client-link--left" href="https://dadgrass.com/" target="_blank" rel="noopener">Dad<br>Grass</a>
+    </div>
   </div>
 
-  <div class="info">
-    <span class="info-label">Contact</span>
-    <span class="info-value">
-      <a href="mailto:brian@dialedinprojects.com">brian@dialedinprojects.com</a>
-    </span>
+  <div class="rule"></div>
+
+  <div class="section" style="align-items:center; gap:0.5rem;">
+    <span class="clients-label">Contact</span>
+    <a class="contact-email" href="mailto:brian@dialedinprojects.com">brian@dialedinprojects.com</a>
   </div>
 
   <script>
@@ -311,7 +317,6 @@
       });
     }
 
-    // Animate a single tile to a target char, stepping through CHARS in order
     async function animateTileTo(t, target, startDelay = 0) {
       await new Promise(r => setTimeout(r, startDelay));
       while (t.current !== target) {
@@ -321,7 +326,6 @@
       }
     }
 
-    // Animate a full row to a target char array, staggered left-to-right
     function animateRowTo(tiles, targets, baseDelay = 0) {
       return Promise.all(
         tiles.map((t, i) => animateTileTo(t, targets[i], baseDelay + i * 48))
