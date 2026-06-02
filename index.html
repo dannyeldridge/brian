@@ -226,6 +226,8 @@
   <div class="board" aria-live="polite">
     <div class="board-row" id="row-0"></div>
     <div class="board-row" id="row-1"></div>
+    <div class="board-row" id="row-2"></div>
+    <div class="board-row" id="row-3"></div>
   </div>
 
   <div class="clients">
@@ -255,20 +257,17 @@
   <script>
     const CHARS = ' ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@.-_&';
 
-    // All cycling phrases must be the same length — pad with spaces
-    const STATIC_LINE  = 'DIALED IN PROJECTS    ';
-    const CYCLE_LINES  = [
-      'AWARD WINNING BRAND STRATEGY  ',
-      'EXPERIENTIAL MARKETING        ',
-      'LOGISTICS AND PARTNERSHIPS    ',
+    const LINES = [
+      'DIALED IN PROJECTS',
+      'AWARD WINNING BRAND STRATEGY',
+      'EXPERIENTIAL MARKETING',
+      'LOGISTICS AND PARTNERSHIPS',
     ];
 
-    // Normalize all rows to the same width as the longest
-    const maxLen = Math.max(STATIC_LINE.length, ...CYCLE_LINES.map(l => l.length));
+    const maxLen = Math.max(...LINES.map(l => l.length));
     function pad(s) { return s.padEnd(maxLen, ' '); }
 
-    const LINE0 = pad(STATIC_LINE).split('');
-    const CYCLES = CYCLE_LINES.map(l => pad(l).split(''));
+    const ROWS = LINES.map(l => pad(l).split(''));
 
     function charIndex(c) {
       const i = CHARS.indexOf(c.toUpperCase());
@@ -300,8 +299,7 @@
       });
     }
 
-    const row0tiles = buildRow('row-0', LINE0);
-    const row1tiles = buildRow('row-1', CYCLES[0]);
+    const allTiles = ROWS.map((row, i) => buildRow(`row-${i}`, row));
 
     function stepTile(t, target) {
       return new Promise(resolve => {
@@ -340,24 +338,15 @@
       );
     }
 
-    // Entry animation: row 0, then row 1
+    // Animate rows in sequence, top to bottom
     async function intro() {
-      await animateRowTo(row0tiles, LINE0, 0);
-      await animateRowTo(row1tiles, CYCLES[0], 200);
-      return animateRowTo(row0tiles, LINE0, 0); // ensure row 0 fully settled
-    }
-
-    // Cycle row 1 through phrases indefinitely
-    async function cycleRow1() {
-      let idx = 0;
-      while (true) {
-        await new Promise(r => setTimeout(r, 3000));
-        idx = (idx + 1) % CYCLES.length;
-        await animateRowTo(row1tiles, CYCLES[idx], 0);
+      for (let i = 0; i < allTiles.length; i++) {
+        await animateRowTo(allTiles[i], ROWS[i], 0);
+        await new Promise(r => setTimeout(r, 180));
       }
     }
 
-    intro().then(cycleRow1);
+    intro();
   </script>
 </body>
 </html>
