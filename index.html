@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dialed In Projects</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0a0a;
+      --tile-bg: #111;
+      --tile-top: #161616;
+      --tile-bottom: #0d0d0d;
+      --tile-border: #1e1e1e;
+      --text: #e8e0d0;
+      --text-dim: #6b6560;
+      --accent: #c8a96e;
+      --gap: 3px;
+      --tile-w: 2.1ch;
+      --tile-h: 3.2rem;
+      --font: 'Courier New', Courier, monospace;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3.5rem;
+      padding: 2rem;
+    }
+
+    /* ── Board ──────────────────────────────────────────── */
+
+    .board {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      align-items: center;
+    }
+
+    .board-row {
+      display: flex;
+      gap: var(--gap);
+    }
+
+    /* ── Tile ───────────────────────────────────────────── */
+
+    .tile {
+      width: var(--tile-w);
+      height: var(--tile-h);
+      position: relative;
+      perspective: 300px;
+      font-size: 1.9rem;
+      font-weight: bold;
+      letter-spacing: 0;
+    }
+
+    /* static halves always visible */
+    .tile-top,
+    .tile-bottom {
+      position: absolute;
+      left: 0;
+      width: 100%;
+      height: 50%;
+      overflow: hidden;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      background: var(--tile-bg);
+      border: 1px solid var(--tile-border);
+      color: var(--text);
+      user-select: none;
+    }
+
+    .tile-top {
+      top: 0;
+      border-bottom: 1px solid #000;
+      background: var(--tile-top);
+      align-items: flex-end;
+    }
+
+    .tile-top span,
+    .tile-bottom span {
+      display: block;
+      line-height: var(--tile-h);
+      transform: translateY(0);
+    }
+
+    .tile-bottom {
+      top: 50%;
+      align-items: flex-start;
+      background: var(--tile-bottom);
+    }
+
+    .tile-bottom span {
+      transform: translateY(-50%);
+    }
+
+    /* the flipping card */
+    .tile-flip {
+      position: absolute;
+      left: 0;
+      width: 100%;
+      height: 50%;
+      transform-origin: bottom center;
+      transform-style: preserve-3d;
+      animation: none;
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    .tile-flip.flipping {
+      animation: flip 120ms linear forwards;
+    }
+
+    @keyframes flip {
+      0%   { transform: rotateX(0deg); }
+      100% { transform: rotateX(-90deg); }
+    }
+
+    .tile-flip-front,
+    .tile-flip-back {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      border: 1px solid var(--tile-border);
+    }
+
+    .tile-flip-front {
+      background: var(--tile-top);
+      align-items: flex-end;
+    }
+
+    .tile-flip-back {
+      background: var(--tile-bottom);
+      align-items: flex-start;
+      transform: rotateX(180deg);
+    }
+
+    .tile-flip-front span,
+    .tile-flip-back span {
+      display: block;
+      line-height: var(--tile-h);
+    }
+
+    .tile-flip-front span { transform: translateY(0); }
+    .tile-flip-back  span { transform: translateY(-50%); }
+
+    /* space tile */
+    .tile.space {
+      width: calc(var(--tile-w) * 0.6);
+      pointer-events: none;
+    }
+
+    /* ── Footer info ────────────────────────────────────── */
+
+    .info {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .info-label {
+      font-size: 0.65rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+    }
+
+    .info-value {
+      font-size: 0.85rem;
+      letter-spacing: 0.1em;
+      color: var(--accent);
+    }
+
+    .info-value a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .info-value a:hover {
+      text-decoration: underline;
+    }
+
+    /* ── Divider ────────────────────────────────────────── */
+
+    .divider {
+      width: 1px;
+      height: 2rem;
+      background: var(--tile-border);
+    }
+
+    /* ── Scanline overlay ───────────────────────────────── */
+
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: repeating-linear-gradient(
+        to bottom,
+        transparent 0px,
+        transparent 3px,
+        rgba(0,0,0,0.08) 3px,
+        rgba(0,0,0,0.08) 4px
+      );
+      pointer-events: none;
+      z-index: 100;
+    }
+
+    @media (max-width: 480px) {
+      :root {
+        --tile-w: 1.7ch;
+        --tile-h: 2.6rem;
+      }
+      .tile { font-size: 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="board" aria-live="polite" aria-label="Dialed In Projects — Coming Soon">
+    <div class="board-row" id="row-0"></div>
+    <div class="board-row" id="row-1"></div>
+  </div>
+
+  <div class="info">
+    <span class="info-label">Status</span>
+    <span class="info-value">Coming Soon</span>
+    <div class="divider"></div>
+    <span class="info-label">Contact</span>
+    <span class="info-value"><a href="mailto:brian@dialedinprojects.com">brian@dialedinprojects.com</a></span>
+  </div>
+
+  <script>
+    const CHARS = ' ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@.-_';
+
+    const LINES = [
+      'DIALED IN PROJECTS',
+      '  COMING  SOON   ',
+    ];
+
+    const ROWS = LINES.map(line => line.split(''));
+
+    function charIndex(c) {
+      const i = CHARS.indexOf(c.toUpperCase());
+      return i === -1 ? 0 : i;
+    }
+
+    function nextChar(c) {
+      return CHARS[(charIndex(c) + 1) % CHARS.length];
+    }
+
+    // Build tiles
+    const tileMaps = ROWS.map((chars, rowIdx) => {
+      const row = document.getElementById(`row-${rowIdx}`);
+      return chars.map((targetChar) => {
+        const tile = document.createElement('div');
+        tile.className = 'tile';
+
+        tile.innerHTML = `
+          <div class="tile-top"><span></span></div>
+          <div class="tile-bottom"><span></span></div>
+          <div class="tile-flip">
+            <div class="tile-flip-front"><span></span></div>
+            <div class="tile-flip-back"><span></span></div>
+          </div>
+        `;
+
+        row.appendChild(tile);
+
+        const topSpan    = tile.querySelector('.tile-top span');
+        const botSpan    = tile.querySelector('.tile-bottom span');
+        const flipEl     = tile.querySelector('.tile-flip');
+        const frontSpan  = tile.querySelector('.tile-flip-front span');
+        const backSpan   = tile.querySelector('.tile-flip-back span');
+
+        let current = ' ';
+        topSpan.textContent = ' ';
+        botSpan.textContent = ' ';
+
+        return { tile, topSpan, botSpan, flipEl, frontSpan, backSpan, current, target: targetChar };
+      });
+    });
+
+    // Animate one step for a tile
+    function stepTile(t) {
+      return new Promise(resolve => {
+        if (t.current === t.target) { resolve(false); return; }
+
+        const from = t.current;
+        const to   = nextChar(from);
+
+        // prep flip card
+        t.frontSpan.textContent = from;
+        t.backSpan.textContent  = to;
+
+        // kick animation
+        t.flipEl.classList.remove('flipping');
+        void t.flipEl.offsetWidth; // reflow
+        t.flipEl.classList.add('flipping');
+
+        t.flipEl.addEventListener('animationend', () => {
+          t.current = to;
+          t.topSpan.textContent = to;
+          t.botSpan.textContent = to;
+          t.flipEl.classList.remove('flipping');
+          resolve(true);
+        }, { once: true });
+      });
+    }
+
+    // Drive each tile independently with staggered start
+    function animateTile(t, delay) {
+      setTimeout(async () => {
+        let changed = true;
+        while (changed) {
+          changed = await stepTile(t);
+          if (changed) await new Promise(r => setTimeout(r, 18 + Math.random() * 30));
+        }
+      }, delay);
+    }
+
+    // Stagger tiles left-to-right, row 0 then row 1
+    let d = 0;
+    tileMaps.forEach((row, ri) => {
+      row.forEach((t, ci) => {
+        animateTile(t, d);
+        d += 55;
+      });
+      d += 120;
+    });
+  </script>
+</body>
+</html>
