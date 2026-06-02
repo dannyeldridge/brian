@@ -134,14 +134,22 @@
       gap: 2.5rem;
     }
 
+    .clients {
+      align-items: center;
+    }
+
     .client-link {
       font-family: 'Bebas Neue', sans-serif;
       font-size: 1.6rem;
+      line-height: 1.1;
       letter-spacing: 0.08em;
       color: var(--text-dim);
       text-decoration: none;
       transition: color 0.2s;
     }
+
+    .client-link--right { text-align: right; }
+    .client-link--left  { text-align: left; }
 
     .client-link:hover { color: var(--accent); }
 
@@ -219,9 +227,9 @@
   </div>
 
   <div class="clients">
-    <a class="client-link" href="https://www.metropublicrelations.com/" target="_blank" rel="noopener">Metro Public Relations</a>
+    <a class="client-link client-link--right" href="https://www.metropublicrelations.com/" target="_blank" rel="noopener">Metro Public<br>Relations</a>
     <div class="clients-divider"></div>
-    <a class="client-link" href="https://dadgrass.com/" target="_blank" rel="noopener">Dad Grass</a>
+    <a class="client-link client-link--left" href="https://dadgrass.com/" target="_blank" rel="noopener">Dad<br>Grass</a>
   </div>
 
   <div class="info">
